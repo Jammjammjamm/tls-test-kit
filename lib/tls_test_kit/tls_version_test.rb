@@ -65,7 +65,7 @@ module TLSTestKit
 
     config(
       options: {
-        required_versions: [OpenSSL::SSL::TLS1_VERSION]
+        minimum_allowed_version: [OpenSSL::SSL::TLS1_2_VERSION]
       }
     )
     run do
