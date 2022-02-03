@@ -1,55 +1,61 @@
-# Inferno Template
+# TLS Test Kit
 
-This is a template repository for an
-[Inferno](https://github.com/inferno-community/inferno-core) test kit.
+This is an [Inferno](https://github.com/inferno-community/inferno-core) test kit
+for TLS connections.
 
 ## Instructions
 
-- Clone this repo.
-- Write your tests in the `lib` folder.
-- Put the `package.tgz` for the IG you're writing tests for in
-  `lib/your_test_kit_name/igs` and update this path in `docker-compose.yml`.
-  This will ensure that the validator has access to the resources needed to
-  validate resources against your IG.
-- Run `setup.sh` in this repo to pull the needed docker images and set up the
-  database.
-- Run `run.sh` to build your tests and run inferno.
-- Navigate to `http://localhost` to access Inferno, where your test suite will
-  be available. To access the FHIR resource validator, navigate to
-  `http://localhost/validator`.
+- `./setup.sh`
+- `./run.sh`
 
-## Documentation
-- [Inferno documentation](https://inferno-framework.github.io/inferno-core/)
-- [Ruby API documentation](https://inferno-framework.github.io/inferno-core/docs)
-- [JSON API documentation](https://inferno-framework.github.io/inferno-core/api-docs)
+## How the test works
 
-## Distributing tests
+The `tls_version_test` allows you to check which versions of TLS are supported
+on a server. You can configure minimum/maximum allowed values and specify
+required versions. The test attempts to make a TLS connection using each of the
+following versions, and will fail if a connection can't be made with a required
+version, or if a connection can be made with a forbidden version:
 
-In order to make your test suite available to others, it needs to be organized
-like a standard ruby gem (ruby libraries are called gems).
+- SSL 2.0
+- SSL 3.0
+- TLS 1.0
+- TLS 1.1
+- TLS 1.2
+- TLS 1.3
 
-- Fill in the information in the `gemspec` file in the root of this repository.
-  The name of this file should match the `spec.name` within the file. This will
-  be the name of the gem you create. For example, if your file is
-  `my_test_kit.gemspec` and its `spec.name` is `'my_test_kit'`, then others will
-  be able to install your gem with `gem install my_test_kit`. There are
-  [recommended naming conventions for
-  gems](https://guides.rubygems.org/name-your-gem/).
-- Your tests must be in `lib`
-- `lib` should contain only one file. All other files should be in a
-  subdirectory. The file in lib be what people use to import your gem after they
-  have installed it. For example, if your test kit contains a file
-  `lib/my_test_suite.rb`, then after installing your test kit gem, I could
-  include your test suite with `require 'my_test_suite'`.
-- **Optional:** Once your gemspec file has been updated, you can publish your
-  gem on [rubygems, the official ruby gem repository](https://rubygems.org/). If
-  you don't publish your gem on rubygems, users will still be able to install it
-  if it is located in a public git repository. To publish your gem on rubygems,
-  you will first need to [make an account on
-  rubygems](https://guides.rubygems.org/publishing/#publishing-to-rubygemsorg)
-  and then run `gem build *.gemspec` and `gem push *.gem`.
+## Using the TLS test in other test suites
 
-## Example Inferno test kits
+The ruby `OpenSSL` library provides
+[constants for each TLS version](https://ruby-doc.org/stdlib-2.7.3/libdoc/openssl/rdoc/OpenSSL/SSL.html):
+```
+OpenSSL::SSL::SSL2_VERSION
+OpenSSL::SSL::SSL3_VERSION
+OpenSSL::SSL::TLS1_VERSION
+OpenSSL::SSL::TLS1_1_VERSION
+OpenSSL::SSL::TLS1_2_VERSION
+OpenSSL::SSL::TLS1_3_VERSION
+```
 
-- https://github.com/inferno-community/ips-test-kit
-- https://github.com/inferno-community/shc-vaccination-test-kit
+Using these constants, you can configure the permitted/forbidden/required
+versions. In the example below, only TLS 1.1 and 1.2 are permitted, and TLS 1.2
+is required. All other versions are forbidden. No minimum/maximum allowed
+version is enforced if none are specified.
+
+```ruby
+require 'tls_test_kit'
+
+test from: :tls_version_test do
+  config(
+    inputs: {
+      url: {
+        title: 'URL whose TLS connections will be tested'
+      }
+    },
+    options: {
+      minimum_allowed_version: OpenSSL::SSL::TLS1_1_VERSION,
+      maximum_allowed_version: OpenSSL::SSL::TLS1_2_VERSION,
+      required_versions: [OpenSSL::SSL::TLS1_2_VERSION]
+    }
+  )
+end
+```
