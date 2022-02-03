@@ -2,7 +2,7 @@ module TLSTestKit
   class TLSVersionTest < Inferno::Test
     title 'Server supports TLS'
     description %(
-      Verify that a server supports a given range of TLS versions.
+      Verify that a server supports TLS.
     )
     id :tls_version_test
 
@@ -63,15 +63,11 @@ module TLSTestKit
 
     input :url, default: 'https://inferno.healthit.gov/reference-server/r4'
 
-    config(
-      options: {
-        minimum_allowed_version: [OpenSSL::SSL::TLS1_2_VERSION]
-      }
-    )
     run do
       uri = URI(url)
       host = uri.host
       port = uri.port
+      tls_support_verified = false
 
       self.class.versions.each do |version, version_string|
         http = Net::HTTP.new(host, port)
@@ -85,8 +81,10 @@ module TLSTestKit
             add_message('error', "Server incorrectly allowed #{version_string} connection.")
           elsif self.class.version_required? version
             add_message('info', "Server correctly allowed #{version_string} connection as required.")
+            tls_support_verified = true
           else
             add_message('info', "Server allowed #{version_string} connection.")
+            tls_support_verified = true
           end
         rescue StandardError => e
           if self.class.version_required? version
@@ -102,6 +100,8 @@ module TLSTestKit
       errors_found = messages.any? { |message| message[:type] == 'error' }
 
       assert !errors_found, 'Server did not permit/deny the connections with the correct TLS versions'
+
+      assert tls_support_verified, 'Server did not support any allowed TLS versions.'
     end
   end
 end
