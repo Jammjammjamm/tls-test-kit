@@ -61,7 +61,7 @@ module TLSTestKit
       end
     end
 
-    input :url, default: 'https://inferno.healthit.gov/reference-server/r4'
+    input :url
 
     run do
       uri = URI(url)
