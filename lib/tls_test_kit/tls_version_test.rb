@@ -6,6 +6,8 @@ module TLSTestKit
     )
     id :tls_version_test
 
+    output :tls_warning_messages
+
     class << self
       def versions
         {
@@ -69,6 +71,8 @@ module TLSTestKit
       port = uri.port
       tls_support_verified = false
 
+      incorrectly_permitted_versions = []
+
       self.class.versions.each do |version, version_string|
         http = Net::HTTP.new(host, port)
         http.use_ssl = true
@@ -78,30 +82,42 @@ module TLSTestKit
         begin
           http.request_get(uri)
           if self.class.version_forbidden? version
-            add_message('error', "Server incorrectly allowed #{version_string} connection.")
+            incorrectly_permitted_versions << version_string
+            add_message(
+              'warning',
+              "#{url} allowed #{version_string} connection even though #{version_string} connections should be denied."
+            )
           elsif self.class.version_required? version
-            add_message('info', "Server correctly allowed #{version_string} connection as required.")
+            add_message('info', "#{url} correctly allowed #{version_string} connection as required.")
             tls_support_verified = true
           else
-            add_message('info', "Server allowed #{version_string} connection.")
+            add_message('info', "#{url} allowed #{version_string} connection.")
             tls_support_verified = true
           end
         rescue StandardError => e
           if self.class.version_required? version
-            add_message('error', "Server incorrectly denied #{version_string} connection: #{e.message}")
+            add_message('error', "#{url} incorrectly denied #{version_string} connection: #{e.message}")
           elsif self.class.version_forbidden? version
-            add_message('info', "Server correctly denied #{version_string} connection as required.")
+            add_message('info', "#{url} correctly denied #{version_string} connection as required.")
           else
-            add_message('info', "Server denied #{version_string} connection.")
+            add_message('info', "#{url} denied #{version_string} connection.")
           end
         end
       end
+
+      warning_messages = messages.select { |message| message[:type] == 'warning' }
+
+      output tls_warning_messages: JSON.generate(warning_messages)
 
       errors_found = messages.any? { |message| message[:type] == 'error' }
 
       assert !errors_found, 'Server did not permit/deny the connections with the correct TLS versions'
 
       assert tls_support_verified, 'Server did not support any allowed TLS versions.'
+
+      if incorrectly_permitted_versions.present?
+        pass "Server allowed TLS connections using versions which should not be permitted: #{incorrectly_permitted_versions.join(', ')}"
+      end
     end
   end
 end
