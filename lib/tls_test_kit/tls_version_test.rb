@@ -107,7 +107,7 @@ module TLSTestKit
 
       warning_messages = messages.select { |message| message[:type] == 'warning' }
 
-      output tls_warning_messages: JSON.generate(warning_messages)
+      output tls_warning_messages: warning_messages.map { |message| message[:message] }.join("\n")
 
       errors_found = messages.any? { |message| message[:type] == 'error' }
 
