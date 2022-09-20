@@ -6,7 +6,7 @@ module TLSTestKit
     )
     id :tls_version_test
 
-    output :tls_warning_messages
+    output :incorrectly_permitted_tls_versions_messages
 
     class << self
       def versions
@@ -61,6 +61,10 @@ module TLSTestKit
       def version_required?(version)
         required_versions.include? version
       end
+
+      def incorrectly_permitted_tls_version_message_type
+        config.options[:incorrectly_permitted_tls_version_message_type] || 'error'
+      end
     end
 
     input :url
@@ -71,7 +75,8 @@ module TLSTestKit
       port = uri.port
       tls_support_verified = false
 
-      incorrectly_permitted_versions = []
+      incorrectly_permitted_tls_versions = []
+      incorrectly_permitted_tls_versions_messages = []
 
       self.class.versions.each do |version, version_string|
         http = Net::HTTP.new(host, port)
@@ -82,11 +87,12 @@ module TLSTestKit
         begin
           http.request_get(uri)
           if self.class.version_forbidden? version
-            incorrectly_permitted_versions << version_string
-            add_message(
-              'warning',
+            message =
               "#{url} allowed #{version_string} connection even though #{version_string} connections should be denied."
-            )
+            incorrectly_permitted_tls_versions << version_string
+            incorrectly_permitted_tls_versions_messages << message
+
+            add_message(self.class.incorrectly_permitted_tls_version_message_type, message)
           elsif self.class.version_required? version
             add_message('info', "#{url} correctly allowed #{version_string} connection as required.")
             tls_support_verified = true
@@ -105,9 +111,7 @@ module TLSTestKit
         end
       end
 
-      warning_messages = messages.select { |message| message[:type] == 'warning' }
-
-      output tls_warning_messages: warning_messages.map { |message| message[:message] }.join("\n")
+      output incorrectly_permitted_tls_versions_messages: incorrectly_permitted_tls_versions_messages.join("\n")
 
       errors_found = messages.any? { |message| message[:type] == 'error' }
 
@@ -115,8 +119,8 @@ module TLSTestKit
 
       assert tls_support_verified, 'Server did not support any allowed TLS versions.'
 
-      if incorrectly_permitted_versions.present?
-        pass "Server allowed TLS connections using versions which should not be permitted: #{incorrectly_permitted_versions.join(', ')}"
+      if incorrectly_permitted_tls_versions.present?
+        pass "Server allowed TLS connections using versions which should not be permitted: #{incorrectly_permitted_tls_versions.join(', ')}"
       end
     end
   end
