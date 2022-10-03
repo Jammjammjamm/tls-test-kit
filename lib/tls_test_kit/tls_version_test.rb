@@ -94,7 +94,7 @@ module TLSTestKit
 
             add_message(self.class.incorrectly_permitted_tls_version_message_type, message)
           elsif self.class.version_required? version
-            add_message('info', "#{url} correctly allowed #{version_string} connection as required.")
+            add_message('info', "#{url} correctly accepted #{version_string} connection as required.")
             tls_support_verified = true
           else
             add_message('info', "#{url} allowed #{version_string} connection.")
