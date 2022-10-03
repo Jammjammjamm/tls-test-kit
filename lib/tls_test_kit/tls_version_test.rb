@@ -76,7 +76,6 @@ module TLSTestKit
       tls_support_verified = false
 
       incorrectly_permitted_tls_versions = []
-      incorrectly_permitted_tls_versions_messages = []
 
       self.class.versions.each do |version, version_string|
         http = Net::HTTP.new(host, port)
@@ -88,9 +87,9 @@ module TLSTestKit
           http.request_get(uri)
           if self.class.version_forbidden? version
             message =
-              "#{url} allowed #{version_string} connection even though #{version_string} connections should be denied."
+              "#{url} accepted #{version_string} connection even though #{version_string} connections should be denied. " \
+              'The system may deny content from being sent over this connection, but this must be manually verified.'
             incorrectly_permitted_tls_versions << version_string
-            incorrectly_permitted_tls_versions_messages << message
 
             add_message(self.class.incorrectly_permitted_tls_version_message_type, message)
           elsif self.class.version_required? version
@@ -111,7 +110,14 @@ module TLSTestKit
         end
       end
 
-      output incorrectly_permitted_tls_versions_messages: incorrectly_permitted_tls_versions_messages.join("\n")
+      if incorrectly_permitted_tls_versions.present?
+        count = incorrectly_permitted_tls_versions.length
+        message =
+          "#{url} did not deny TLS connections for #{'version'.pluralize(count)} " \
+          "#{incorrectly_permitted_tls_versions.join(', ')}. The system may deny content from being sent over this" \
+          'connection, but this must be manually verified.'
+        output incorrectly_permitted_tls_versions_messages: message
+      end
 
       errors_found = messages.any? { |message| message[:type] == 'error' }
 
