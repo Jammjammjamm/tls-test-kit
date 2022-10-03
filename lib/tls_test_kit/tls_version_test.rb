@@ -120,7 +120,7 @@ module TLSTestKit
       assert tls_support_verified, 'Server did not support any allowed TLS versions.'
 
       if incorrectly_permitted_tls_versions.present?
-        pass "Server allowed TLS connections using versions which should not be permitted: #{incorrectly_permitted_tls_versions.join(', ')}"
+        pass "Server accepted TLS connections using versions which should be denied: #{incorrectly_permitted_tls_versions.join(', ')}"
       end
     end
   end
