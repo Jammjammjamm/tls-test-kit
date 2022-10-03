@@ -97,7 +97,7 @@ module TLSTestKit
             add_message('info', "#{url} correctly accepted #{version_string} connection as required.")
             tls_support_verified = true
           else
-            add_message('info', "#{url} allowed #{version_string} connection.")
+            add_message('info', "#{url} accepted #{version_string} connection.")
             tls_support_verified = true
           end
         rescue StandardError => e
