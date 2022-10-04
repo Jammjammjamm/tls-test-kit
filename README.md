@@ -41,6 +41,13 @@ versions. In the example below, only TLS 1.1 and 1.2 are permitted, and TLS 1.2
 is required. All other versions are forbidden. No minimum/maximum allowed
 version is enforced if none are specified.
 
+The `incorrectly_permitted_tls_version_message_type` option allows you to
+determine the behavior of the test when a server allows a TLS connection to be
+established using an unpermitted version. It defaults to `'error'`, which will
+cause the test to fail when a connection is established using an unpermitted
+version. Values of `'info'` or `'warning'` will allow the test to still pass
+with details in an info or warning message.
+
 ```ruby
 require 'tls_test_kit'
 
@@ -54,7 +61,8 @@ test from: :tls_version_test do
     options: {
       minimum_allowed_version: OpenSSL::SSL::TLS1_1_VERSION,
       maximum_allowed_version: OpenSSL::SSL::TLS1_2_VERSION,
-      required_versions: [OpenSSL::SSL::TLS1_2_VERSION]
+      required_versions: [OpenSSL::SSL::TLS1_2_VERSION],
+      incorrectly_permitted_tls_version_message_type: 'warning'
     }
   )
 end
