@@ -114,7 +114,7 @@ module TLSTestKit
         count = incorrectly_permitted_tls_versions.length
         message =
           "#{url} did not deny TLS connections for #{'version'.pluralize(count)} " \
-          "#{incorrectly_permitted_tls_versions.join(', ')}. The system may deny content from being sent over this" \
+          "#{incorrectly_permitted_tls_versions.join(', ')}. The system may deny content from being sent over this " \
           'connection, but this must be manually verified.'
         output incorrectly_permitted_tls_versions_messages: message
       end
