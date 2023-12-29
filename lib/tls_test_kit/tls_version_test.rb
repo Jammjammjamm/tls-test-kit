@@ -70,6 +70,7 @@ module TLSTestKit
     input :url
 
     run do
+      skip_if url.blank?, "Could not verify when no url provided."
       uri = URI(url)
       host = uri.host
       port = uri.port
