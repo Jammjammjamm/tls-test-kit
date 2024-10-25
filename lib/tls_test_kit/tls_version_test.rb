@@ -70,6 +70,7 @@ module TLSTestKit
     input :url
 
     run do
+      omit_if ENV['INFERNO_DISABLE_TLS_TEST'], "This test is disabled because INFERNO_DISABLE_TLS_TEST is present in env."
       skip_if url.blank?, "Could not verify when no url provided."
       
       uri = URI(url)
