@@ -70,8 +70,10 @@ end
 
 ## Disabling the TLS Test
 
-If the environment variable `INFERNO_DISABLE_TLS_TEST` is present the test always result in `omit`. This is intended
-for continuous integration testing.
+If the environment variable `INFERNO_DISABLE_TLS_TEST` equals `"true"`
+(case-insensitive) then test always result in `omit`. To view this behavior you
+can do `INFERNO_DISABLE_TLS_TEST=true inferno start` when starting Inferno.
+This is intended for continuous integration testing.
 
 ## License
 
