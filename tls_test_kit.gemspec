@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = 'tls_test_kit'
-  spec.version       = '0.2.2'
+  spec.version       = '0.2.3'
   spec.authors       = ['Stephen MacVicar']
   spec.email         = ['inferno@groups.mitre.org']
   spec.summary       = 'Inferno tests for server TLS support'
