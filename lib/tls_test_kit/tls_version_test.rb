@@ -1,4 +1,22 @@
 module TLSTestKit
+  # @example
+  #   require 'tls_test_kit'
+  #   
+  #   test from: :tls_version_test do
+  #     config(
+  #       inputs: {
+  #         url: {
+  #           title: 'URL whose TLS connections will be tested'
+  #         }
+  #       },
+  #       options: {
+  #         minimum_allowed_version: OpenSSL::SSL::TLS1_1_VERSION,
+  #         maximum_allowed_version: OpenSSL::SSL::TLS1_2_VERSION,
+  #         required_versions: [OpenSSL::SSL::TLS1_2_VERSION],
+  #         incorrectly_permitted_tls_version_message_type: 'warning'
+  #       }
+  #     )
+  #   end
   class TLSVersionTest < Inferno::Test
     title 'Server supports TLS'
     description %(
