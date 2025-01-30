@@ -1,6 +1,6 @@
 # TLS Test Kit
 
-This is an [Inferno](https://github.com/inferno-community/inferno-core) test kit
+This is an [Inferno](https://inferno-framework.github.io/) Test Kit
 for TLS connections.
 
 ## Instructions

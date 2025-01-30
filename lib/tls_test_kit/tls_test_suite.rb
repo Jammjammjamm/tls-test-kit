@@ -1,4 +1,4 @@
-require_relative 'tls_test_version'
+require_relative 'tls_version_test'
 
 module TLSTestKit
   class TLSTestSuite < Inferno::TestSuite
@@ -21,5 +21,23 @@ module TLSTestKit
              }
            }
     end
+
+    links [
+      {
+        type: 'report_issue',
+        label: 'Report Issue',
+        url: 'https://github.com/inferno-framework/tls-test-kit/issues/'
+      },
+      {
+        type: 'source_code',
+        label: 'Open Source',
+        url: 'https://github.com/inferno-framework/tls-test-kit/'
+      },
+      {
+        type: 'download',
+        label: 'Download', 
+        url: 'https://github.com/inferno-framework/tls-test-kit/releases/'
+      }
+    ]
   end
 end

@@ -11,4 +11,5 @@ gem 'inferno_core', git: 'git@gitlab.mitre.org:inferno/inferno-core.git', branch
 
 group :development, :test do
   gem 'debug'
+  gem 'rack-test'
 end
