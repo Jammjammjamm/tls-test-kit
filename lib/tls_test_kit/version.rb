@@ -1,6 +1,6 @@
 # version.rb
 
 module TLSTestKit
-  VERSION = '0.2.3'.freeze          # TODO breaking change next release
-  LAST_UPDATED = '2025-30-1'.freeze # TODO update next release
+  VERSION = '0.3.0'.freeze
+  LAST_UPDATED = '2025-02-10'.freeze # TODO update next release
 end
